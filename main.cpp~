@@ -1,0 +1,42 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+using namespace std;
+
+int main() {
+    for (;;) {
+        cout << "\nYOU: ";
+        string phrase;
+        getline(cin, phrase);
+
+        stringstream pythonCommand;
+        pythonCommand << "python nlp_module.py \"" << phrase << "\"";
+        string nlpOutput = "";
+        FILE *pipe = popen(pythonCommand.str().c_str(), "r");
+        if (!pipe) {
+            cerr << "Error executing Python script." << endl;
+            return 1;
+        }
+        char buffer[128];
+        while (!feof(pipe)) {
+            if (fgets(buffer, 128, pipe) != NULL)
+                nlpOutput += buffer;
+        }
+        pclose(pipe);
+
+        string intent;
+        vector<pair<string, string>> entities;
+       
+        string response = "I'm sorry, I didn't understand.";
+        if (intent == "greet") {
+            response = "Hello! How can I assist you today?";
+        } else if (intent == "search") {
+            response = "Let me find that information for you.";
+        } 
+
+        cout << "Stella: " << response << endl;
+    }
+
+    return 0;
+}
